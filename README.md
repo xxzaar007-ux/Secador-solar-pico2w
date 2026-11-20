@@ -1,0 +1,1 @@
+# Secador-solar-pico2w
