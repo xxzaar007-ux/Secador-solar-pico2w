@@ -2,8 +2,8 @@
 #include "pico/stdlib.h"
 #include "hardware/sync.h"
 
-#define PIN_DT   20
-#define PIN_SCK  21
+#define PIN_DT   14
+#define PIN_SCK  15
 #define N        100
 
 
