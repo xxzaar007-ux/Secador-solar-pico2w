@@ -61,9 +61,9 @@ Además usamos una protoboard para las pruebas, una placa perforada para el mont
 
 | Componente | Pin del componente | Pin de la Pico 2 W |
 | --- | --- | --- |
-| SHT31 | SDA / SCL | *(completar)* |
-| HX711 | DT / SCK | *(completar)* |
-| MOSFET HW-042 | Señal PWM | *(completar)* |
+| SHT31 | SDA / SCL | GP4 / GP5 (pines 6 / 7) |
+| HX711 | DT / SCK | GP14 / GP15 (pines 19 / 20) |
+| MOSFET HW-042 | Señal PWM | GP16 (pin 21, con resistencia de 220 Ω) |
 | Sensores | VCC / GND | 3V3 / GND |
 
 El diagrama de conexiones completo está en la carpeta `docs/`.
@@ -84,13 +84,20 @@ En el **dashboard de Adafruit IO** se puede:
 
 ## Nuestro reto de arquitectura
 
-Para el reto elegimos **C/C++ con Pico SDK** *(por confirmar)*. Vamos a reescribir en C la parte que lee la balanza (el HX711) y compararla con la versión en MicroPython, para ver cuánto mejora en velocidad y precisión.
+Para el reto elegimos **C/C++ con Pico SDK**. Reescribimos en C la parte que lee la balanza (el HX711) y la comparamos con la versión en MicroPython, con el mismo circuito (DT en GP14, SCK en GP15) y el mismo peso sobre la celda.
 
 | Qué medimos | Cómo lo medimos | MicroPython | C (Pico SDK) |
 | --- | --- | --- | --- |
-| Tiempo por lectura (µs) | Promedio de 100 lecturas | *(completar)* | *(completar)* |
-| Precisión (g) | Variación de 100 lecturas con un peso conocido | *(completar)* | *(completar)* |
-| Lecturas por segundo | Lecturas completas en 10 s | *(completar)* | *(completar)* |
+| Tiempo por lectura (µs) | Promedio de 100 lecturas | 371.2 (mín 364, máx 388) | **15.9** (mín 15, máx 22) |
+| CPU ocupada (a 10 lecturas/s) | Tiempo de lectura × 10 / 1 s | 0.371 % | **0.016 %** |
+| Precisión (g) | Desviación estándar con el mismo peso | 0.84 g (31 lecturas) | **0.67 g** (100 lecturas) |
+| Lecturas por segundo | Lecturas completas en 10 s | 11.7 | 11.7 |
+
+![Comparación MicroPython vs C](mediciones/figura5_reto_hx711.png)
+
+**Qué concluimos:** en C la lectura es unas **23 veces más rápida**, porque los pulsos de reloj se generan con código compilado que escribe directo en los registros GPIO, mientras que en MicroPython cada cambio de pin pasa por el intérprete. Así queda más CPU libre para el Wi-Fi y las demás tareas. Las dos versiones tienen precisión menor a 1 g. Las lecturas por segundo son iguales porque las limita el HX711 (unas 10 por segundo), no el lenguaje.
+
+Los datos completos están en `mediciones/` (ver `mediciones/resultados_reto_hx711.md`).
 
 ## Las piezas que imprimimos en 3D
 
