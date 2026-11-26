@@ -53,7 +53,7 @@ El cerebro del sistema es una **Raspberry Pi Pico 2 W**, que tiene Wi-Fi integra
 - **Celda de carga de 5 kg con el módulo HX711**, para pesar el grano. El HX711 usa su propia comunicación de dos hilos (reloj y datos).
 - **Ventilador extractor de 12 V**, que controlamos con **PWM** a través de un módulo **MOSFET HW-042**. Así no solo lo prendemos y apagamos, también regulamos su velocidad.
 
-Para la energía usamos una **fuente de 12 V y 2 A**. El extractor la usa directamente, y un **convertidor LM2596** la baja a 5 V para la Pico. Tiene un interruptor de encendido, y todas las tierras (GND) están unidas para que las señales funcionen bien.
+Para la energía usamos una **fuente de 12 V y 2 A**. El extractor la usa directamente, y un **convertidor LM2596** la baja a 5 V para la Pico, que se alimenta por VSYS (pin 39). Así el sistema arranca solo, sin computadora. Tiene un interruptor de encendido, y todas las tierras (GND) están unidas para que las señales funcionen bien.
 
 Además usamos una protoboard para las pruebas, una placa perforada para el montaje final, resistencias, cables Dupont y un cable micro-USB.
 
@@ -117,7 +117,7 @@ Para el reto elegimos **C/C++ con Pico SDK**. Reescribimos en C la parte que lee
 | --- | --- | --- | --- |
 | Tiempo por lectura (µs) | Promedio de 100 lecturas | 371.2 (mín 364, máx 388) | **15.9** (mín 15, máx 22) |
 | CPU ocupada (a 10 lecturas/s) | Tiempo de lectura × 10 / 1 s | 0.371 % | **0.016 %** |
-| Precisión (g) | Desviación estándar con el mismo peso | 0.84 g (31 lecturas) | **0.67 g** (100 lecturas) |
+| Precisión (g) | Desviación estándar con el mismo peso | 0.83 g (31 lecturas) | **0.67 g** (100 lecturas) |
 | Lecturas por segundo | Lecturas completas en 10 s | 11.7 | 11.7 |
 
 ![Comparación MicroPython vs C](mediciones/figura5_reto_hx711.png)
@@ -136,7 +136,7 @@ Así quedaron impresas. Atrás está el ducto del extractor, a la izquierda la b
 
 ![Piezas impresas en 3D: ducto del extractor, base de la balanza y bandeja de pesaje](piezas_impresas.png)
 
-Los archivos están en la carpeta `cad/`. *(completar)*
+Los archivos STL están en la carpeta `cad/`.
 
 ## ¿Qué hay en este repositorio?
 
@@ -159,7 +159,15 @@ docs/                  Diagrama de conexiones, fotos y el paper
 
 ## Lo que obtuvimos
 
-*(Completar con las mediciones reales: precisión de los sensores, curva de secado, funcionamiento de las alertas y resultados del reto de arquitectura.)*
+- **Balanza:** la calibramos con la tara y un peso conocido, y obtuvimos una escala de 450.7 cuentas por gramo. El ruido fue de 0.20 g sin carga y de 0.67 g con carga, cientos de veces menor que el agua que pierde un secado (375 g en el ejemplo de 1000 g).
+- **SHT31:** lo usamos con su calibración de fábrica (±2 % HR y ±0.3 °C según la hoja de datos), porque no contamos con un termohigrómetro de referencia.
+- **Sistema completo:** la Pico arranca sola, lee los sensores, publica en Adafruit IO cada 20 s, envía las alertas al instante y responde al control del extractor desde el celular. Si se cae el Wi-Fi, se reconecta sola.
+- **Curva de secado:** un secado real dura varios días, así que para probar el dashboard y los avisos cargamos una curva **simulada** (modelo de Page, de 1000 g a unos 615 g en 81 h). La curva cruza el objetivo de 625 g calculado con la fórmula.
+- **Reto de arquitectura:** la lectura en C es 23 veces más rápida y usa 23 veces menos CPU que en MicroPython, con precisión menor a 1 g en ambas (ver la sección del reto).
+
+**Limitaciones:** no completamos un secado real ni validamos las lecturas con varios pesos patrón o un instrumento de referencia. La versión en C se midió como programa aparte; el sistema sigue leyendo la balanza en MicroPython.
+
+El detalle está en el paper, en la carpeta `docs/`.
 
 ## Quiénes somos
 
