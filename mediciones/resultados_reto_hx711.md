@@ -1,12 +1,12 @@
 # Resultados del reto: HX711 en C vs MicroPython
 
-Mismo circuito (DT GP14, SCK GP15), celda de 5 kg. Escala: 450.7 cuentas/g (de `calib_celda.json`).
+Mismo circuito (DT GP14, SCK GP15), celda de 5 kg. Escala: 300.5 cuentas = 0.67 g (≈ 448.5 cuentas/g).
 
 | Qué medimos | MicroPython | C (Pico SDK) | Mejora |
 |---|---|---|---|
 | Tiempo por lectura (µs) | 371.2 (mín 364, máx 388) | 15.9 (mín 15, máx 22) | 23.3× más rápido |
 | CPU ocupada a 10 lecturas/s | 0.371 % | 0.016 % | 23× menos |
-| Precisión (desv. estándar, mismo peso) | 0.83 g (n = 31) | 0.67 g (n = 100) | 19 % menor |
+| Precisión (desv. estándar, mismo peso) | 0.84 g (n = 31) | 0.67 g (n = 100) | 20 % menor |
 | Lecturas por segundo | 11.7 | 11.7 | Igual (lo limita el HX711) |
 
 ## Archivos
